@@ -42,10 +42,14 @@ const Hero = () => {
               <div className="flex-1 relative">
                 <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 <Input 
-                  placeholder="Enter your location" 
+                  placeholder="Enter location or use map" 
                   className="pl-10 border-0 bg-transparent focus:ring-0"
                 />
               </div>
+              <Button variant="outline" size="lg" className="md:w-auto">
+                <MapPin className="h-4 w-4 md:mr-2" />
+                <span className="hidden md:inline">Map View</span>
+              </Button>
               <Button variant="hero" size="lg" className="md:px-8">
                 Search
               </Button>

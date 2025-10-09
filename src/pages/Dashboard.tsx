@@ -1,9 +1,14 @@
 import Header from "@/components/Header";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Calendar, Clock, Star, Users } from "lucide-react";
+import { Calendar, Clock, Star, Users, AlertCircle, MessageSquare } from "lucide-react";
+import ComplaintForm from "@/components/ComplaintForm";
+import ReviewForm from "@/components/ReviewForm";
+import { useState } from "react";
 
 const Dashboard = () => {
+  const [activeSection, setActiveSection] = useState<"bookings" | "reviews" | "complaints">("bookings");
+
   return (
     <div className="min-h-screen bg-background">
       <Header />
@@ -22,13 +27,29 @@ const Dashboard = () => {
                 <CardTitle className="text-lg">Quick Actions</CardTitle>
               </CardHeader>
               <CardContent className="space-y-3">
-                <Button className="w-full justify-start">
+                <Button 
+                  className="w-full justify-start"
+                  variant={activeSection === "bookings" ? "default" : "ghost"}
+                  onClick={() => setActiveSection("bookings")}
+                >
                   <Calendar className="mr-2 h-4 w-4" />
                   My Bookings
                 </Button>
-                <Button variant="ghost" className="w-full justify-start">
+                <Button 
+                  variant={activeSection === "reviews" ? "default" : "ghost"}
+                  className="w-full justify-start"
+                  onClick={() => setActiveSection("reviews")}
+                >
                   <Star className="mr-2 h-4 w-4" />
                   My Reviews
+                </Button>
+                <Button 
+                  variant={activeSection === "complaints" ? "default" : "ghost"}
+                  className="w-full justify-start"
+                  onClick={() => setActiveSection("complaints")}
+                >
+                  <AlertCircle className="mr-2 h-4 w-4" />
+                  Complaints
                 </Button>
                 <Button variant="ghost" className="w-full justify-start">
                   <Users className="mr-2 h-4 w-4" />
@@ -79,19 +100,29 @@ const Dashboard = () => {
               </Card>
             </div>
 
-            {/* Recent Bookings */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Recent Bookings</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-center py-12 text-muted-foreground">
-                  <Calendar className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                  <p>No recent bookings</p>
-                  <Button variant="hero" className="mt-4">Book a Service</Button>
-                </div>
-              </CardContent>
-            </Card>
+            {/* Dynamic Content Section */}
+            {activeSection === "bookings" && (
+              <Card>
+                <CardHeader>
+                  <CardTitle>Recent Bookings</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-center py-12 text-muted-foreground">
+                    <Calendar className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                    <p>No recent bookings</p>
+                    <Button variant="hero" className="mt-4">Book a Service</Button>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+
+            {activeSection === "reviews" && (
+              <ReviewForm providerName="John Smith (Electrician)" />
+            )}
+
+            {activeSection === "complaints" && (
+              <ComplaintForm providerName="Maria Rodriguez (Plumber)" />
+            )}
           </div>
         </div>
       </main>

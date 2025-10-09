@@ -37,8 +37,12 @@ const Header = () => {
           </Button>
           
           <div className="hidden md:flex items-center space-x-2">
-            <Button variant="ghost">Login</Button>
-            <Button variant="hero">Sign Up</Button>
+            <Link to="/login">
+              <Button variant="ghost">Login</Button>
+            </Link>
+            <Link to="/login">
+              <Button variant="hero">Sign Up</Button>
+            </Link>
           </div>
 
           {/* Mobile Menu */}

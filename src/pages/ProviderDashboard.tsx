@@ -1,192 +1,349 @@
+import { useState } from "react";
 import Header from "@/components/Header";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Star, CheckCircle, XCircle, Edit, Trash2, Calendar } from "lucide-react";
-import { useState } from "react";
-import { useToast } from "@/hooks/use-toast";
+import { Star, Calendar, DollarSign, Clock, User, Briefcase, Edit } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
 
-// Mock data
-const mockProfile = {
-  name: "John Smith",
-  photo: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face",
-  service: "Licensed Electrician",
-  pricing: "$45/hr",
-  availability: "Mon-Sat, 9AM-6PM",
-  experience: 8,
-  rating: 4.9,
-  aadhaar: "XXXX-XXXX-1234"
-};
-
-const mockBookingRequests = [
-  { id: 1, customer: "Sarah Johnson", service: "Electrical Repair", date: "2024-03-15", time: "2:00 PM", status: "pending" },
-  { id: 2, customer: "Mike Davis", service: "Wiring Installation", date: "2024-03-16", time: "10:00 AM", status: "pending" },
-];
-
-const mockReviews = [
-  { id: 1, customer: "Emily Chen", rating: 5, comment: "Excellent work! Very professional and quick.", date: "2024-03-10" },
-  { id: 2, customer: "David Brown", rating: 4, comment: "Good service, arrived on time.", date: "2024-03-08" },
-  { id: 3, customer: "Lisa Wilson", rating: 5, comment: "Highly recommend! Fixed the issue perfectly.", date: "2024-03-05" },
-];
+type ProviderSection = "overview" | "profile" | "services" | "bookings" | "reviews";
 
 const ProviderDashboard = () => {
-  const [profile, setProfile] = useState(mockProfile);
-  const [requests, setRequests] = useState(mockBookingRequests);
-  const { toast } = useToast();
-
-  const handleAccept = (id: number) => {
-    setRequests(requests.filter(r => r.id !== id));
-    toast({
-      title: "Booking Accepted",
-      description: "The customer has been notified.",
-    });
-  };
-
-  const handleReject = (id: number) => {
-    setRequests(requests.filter(r => r.id !== id));
-    toast({
-      title: "Booking Rejected",
-      description: "The customer has been notified.",
-    });
-  };
+  const [activeSection, setActiveSection] = useState<ProviderSection>("overview");
 
   return (
     <div className="min-h-screen bg-background">
       <Header />
       
       <main className="container mx-auto px-4 py-8">
-        <div className="mb-8">
-          <h1 className="text-heading font-bold text-foreground mb-2">Provider Dashboard</h1>
-          <p className="text-muted-foreground">Manage your services and bookings</p>
-        </div>
+        <div className="max-w-7xl mx-auto">
+          <h1 className="text-heading font-bold text-foreground mb-2">Local Pro Dashboard</h1>
+          <p className="text-muted-foreground mb-8">Manage your services and bookings</p>
 
-        <div className="grid lg:grid-cols-3 gap-6">
-          {/* Profile Section */}
-          <div className="lg:col-span-1 space-y-6">
-            <Card>
+          <div className="grid md:grid-cols-4 gap-6">
+            {/* Sidebar */}
+            <Card className="md:col-span-1 h-fit shadow-md">
               <CardHeader>
-                <CardTitle>My Profile</CardTitle>
+                <CardTitle className="text-base">Menu</CardTitle>
               </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="flex flex-col items-center">
-                  <img 
-                    src={profile.photo} 
-                    alt={profile.name}
-                    className="w-24 h-24 rounded-full mb-4"
-                  />
-                  <h3 className="font-semibold text-lg">{profile.name}</h3>
-                  <p className="text-sm text-muted-foreground">{profile.service}</p>
-                  <div className="flex items-center gap-1 mt-2">
-                    <Star className="h-4 w-4 fill-tertiary text-tertiary" />
-                    <span className="font-semibold">{profile.rating}</span>
-                    <span className="text-sm text-muted-foreground">({mockReviews.length} reviews)</span>
-                  </div>
-                </div>
-
-                <div className="space-y-2 pt-4 border-t">
-                  <div className="space-y-2">
-                    <Label htmlFor="pricing">Pricing</Label>
-                    <Input id="pricing" defaultValue={profile.pricing} />
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <Label htmlFor="availability">Availability</Label>
-                    <Input id="availability" defaultValue={profile.availability} />
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <Label htmlFor="experience">Experience (years)</Label>
-                    <Input id="experience" type="number" defaultValue={profile.experience} />
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <Label htmlFor="aadhaar">Aadhaar (verified)</Label>
-                    <Input id="aadhaar" defaultValue={profile.aadhaar} disabled />
-                  </div>
-
-                  <Button className="w-full mt-4" variant="hero">
-                    Update Profile
-                  </Button>
-                </div>
+              <CardContent className="space-y-2">
+                <Button 
+                  variant={activeSection === "overview" ? "default" : "outline"}
+                  className="w-full justify-start"
+                  onClick={() => setActiveSection("overview")}
+                >
+                  <Briefcase className="mr-2 h-4 w-4" />
+                  Overview
+                </Button>
+                <Button 
+                  variant={activeSection === "profile" ? "default" : "outline"}
+                  className="w-full justify-start"
+                  onClick={() => setActiveSection("profile")}
+                >
+                  <User className="mr-2 h-4 w-4" />
+                  Profile
+                </Button>
+                <Button 
+                  variant={activeSection === "services" ? "default" : "outline"}
+                  className="w-full justify-start"
+                  onClick={() => setActiveSection("services")}
+                >
+                  <Edit className="mr-2 h-4 w-4" />
+                  Services
+                </Button>
+                <Button 
+                  variant={activeSection === "bookings" ? "default" : "outline"}
+                  className="w-full justify-start"
+                  onClick={() => setActiveSection("bookings")}
+                >
+                  <Calendar className="mr-2 h-4 w-4" />
+                  Bookings
+                </Button>
+                <Button 
+                  variant={activeSection === "reviews" ? "default" : "outline"}
+                  className="w-full justify-start"
+                  onClick={() => setActiveSection("reviews")}
+                >
+                  <Star className="mr-2 h-4 w-4" />
+                  Reviews
+                </Button>
               </CardContent>
             </Card>
-          </div>
 
-          {/* Main Content */}
-          <div className="lg:col-span-2 space-y-6">
-            {/* Booking Requests */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Booking Requests</CardTitle>
-              </CardHeader>
-              <CardContent>
-                {requests.length === 0 ? (
-                  <div className="text-center py-8 text-muted-foreground">
-                    <Calendar className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                    <p>No pending requests</p>
+            {/* Main Content */}
+            <div className="md:col-span-3 space-y-6">
+              {activeSection === "overview" && (
+                <>
+                  {/* Stats */}
+                  <div className="grid sm:grid-cols-4 gap-4">
+                    <Card className="shadow-sm">
+                      <CardHeader className="pb-3">
+                        <CardDescription className="flex items-center gap-2">
+                          <Calendar className="h-4 w-4" />
+                          Pending
+                        </CardDescription>
+                        <CardTitle className="text-3xl text-warning">5</CardTitle>
+                      </CardHeader>
+                    </Card>
+                    <Card className="shadow-sm">
+                      <CardHeader className="pb-3">
+                        <CardDescription className="flex items-center gap-2">
+                          <DollarSign className="h-4 w-4" />
+                          Earnings
+                        </CardDescription>
+                        <CardTitle className="text-3xl text-success">₹45k</CardTitle>
+                      </CardHeader>
+                    </Card>
+                    <Card className="shadow-sm">
+                      <CardHeader className="pb-3">
+                        <CardDescription className="flex items-center gap-2">
+                          <Star className="h-4 w-4" />
+                          Rating
+                        </CardDescription>
+                        <CardTitle className="text-3xl text-tertiary">4.8</CardTitle>
+                      </CardHeader>
+                    </Card>
+                    <Card className="shadow-sm">
+                      <CardHeader className="pb-3">
+                        <CardDescription className="flex items-center gap-2">
+                          <Briefcase className="h-4 w-4" />
+                          Jobs
+                        </CardDescription>
+                        <CardTitle className="text-3xl text-primary">234</CardTitle>
+                      </CardHeader>
+                    </Card>
                   </div>
-                ) : (
-                  <div className="space-y-4">
-                    {requests.map((request) => (
-                      <div key={request.id} className="flex items-center justify-between p-4 border rounded-lg">
-                        <div className="flex-1">
-                          <h4 className="font-semibold">{request.customer}</h4>
-                          <p className="text-sm text-muted-foreground">{request.service}</p>
-                          <p className="text-sm text-muted-foreground">{request.date} at {request.time}</p>
+
+                  {/* Profile Summary */}
+                  <Card className="shadow-md">
+                    <CardHeader>
+                      <CardTitle>Profile Summary</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="flex items-center gap-4">
+                        <div className="h-20 w-20 rounded-full bg-gradient-accent flex items-center justify-center text-white text-3xl font-bold flex-shrink-0">
+                          JS
                         </div>
-                        <div className="flex gap-2">
-                          <Button 
-                            size="sm" 
-                            variant="default"
-                            onClick={() => handleAccept(request.id)}
-                          >
-                            <CheckCircle className="h-4 w-4 mr-1" />
-                            Accept
+                        <div className="flex-1">
+                          <h3 className="font-semibold text-lg">John Smith</h3>
+                          <p className="text-sm text-muted-foreground">Professional Electrician</p>
+                          <div className="flex items-center gap-3 mt-2 flex-wrap">
+                            <Badge>Verified</Badge>
+                            <Badge variant="outline">5 Years Experience</Badge>
+                            <div className="flex items-center gap-1">
+                              <Star className="h-4 w-4 fill-tertiary text-tertiary" />
+                              <span className="font-medium">4.8</span>
+                              <span className="text-sm text-muted-foreground">(124 reviews)</span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </>
+              )}
+
+              {activeSection === "profile" && (
+                <Card className="shadow-md">
+                  <CardHeader>
+                    <CardTitle>Edit Profile</CardTitle>
+                    <CardDescription>Update your professional information</CardDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <div className="grid sm:grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="name">Full Name</Label>
+                        <Input id="name" defaultValue="John Smith" />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="age">Age</Label>
+                        <Input id="age" type="number" defaultValue="32" />
+                      </div>
+                    </div>
+
+                    <div className="grid sm:grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="email">Email</Label>
+                        <Input id="email" type="email" defaultValue="john.smith@example.com" />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="phone">Phone Number</Label>
+                        <Input id="phone" type="tel" defaultValue="+91 98765 43210" />
+                      </div>
+                    </div>
+
+                    <div className="grid sm:grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="service">Service Type</Label>
+                        <select 
+                          id="service" 
+                          className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background"
+                        >
+                          <option value="electrician">Electrician</option>
+                          <option value="plumber">Plumber</option>
+                          <option value="laundry">Laundry Service</option>
+                        </select>
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="experience">Years of Experience</Label>
+                        <Input id="experience" type="number" defaultValue="5" />
+                      </div>
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="aadhaar">Aadhaar Number</Label>
+                      <Input id="aadhaar" defaultValue="XXXX-XXXX-1234" disabled />
+                      <p className="text-xs text-muted-foreground">Aadhaar number cannot be changed</p>
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="pricing">Hourly Rate (₹)</Label>
+                      <Input id="pricing" type="number" defaultValue="500" />
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="bio">Bio</Label>
+                      <Textarea 
+                        id="bio" 
+                        rows={4}
+                        defaultValue="Certified electrician with 5 years of experience in residential and commercial projects. Available 24/7 for emergencies."
+                      />
+                    </div>
+
+                    <Button variant="hero" className="w-full">
+                      Save Changes
+                    </Button>
+                  </CardContent>
+                </Card>
+              )}
+
+              {activeSection === "services" && (
+                <Card className="shadow-md">
+                  <CardHeader>
+                    <CardTitle>My Services</CardTitle>
+                    <CardDescription>Manage your service offerings</CardDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    {[
+                      { name: "Electrical Wiring", price: "₹500/hr", status: "Active" },
+                      { name: "Circuit Repairs", price: "₹600/hr", status: "Active" },
+                      { name: "Emergency Services", price: "₹1000/hr", status: "Active" },
+                    ].map((service, idx) => (
+                      <div key={idx} className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-4 border rounded-lg hover:bg-muted/30 transition-colors gap-3">
+                        <div className="flex-1">
+                          <h4 className="font-medium">{service.name}</h4>
+                          <p className="text-sm text-muted-foreground">{service.price}</p>
+                        </div>
+                        <div className="flex items-center gap-2 w-full sm:w-auto">
+                          <Badge>{service.status}</Badge>
+                          <Button variant="outline" size="sm" className="flex-1 sm:flex-none">
+                            <Edit className="h-3 w-3 mr-1" />
+                            Edit
                           </Button>
-                          <Button 
-                            size="sm" 
-                            variant="destructive"
-                            onClick={() => handleReject(request.id)}
-                          >
-                            <XCircle className="h-4 w-4 mr-1" />
-                            Reject
+                          <Button variant="destructive" size="sm" className="flex-1 sm:flex-none">
+                            Delete
                           </Button>
                         </div>
                       </div>
                     ))}
-                  </div>
-                )}
-              </CardContent>
-            </Card>
+                    <Button variant="hero" className="w-full">
+                      Add New Service
+                    </Button>
+                  </CardContent>
+                </Card>
+              )}
 
-            {/* Reviews */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Customer Reviews</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  {mockReviews.map((review) => (
-                    <div key={review.id} className="p-4 border rounded-lg">
-                      <div className="flex items-start justify-between mb-2">
-                        <div>
-                          <h4 className="font-semibold">{review.customer}</h4>
-                          <div className="flex items-center gap-1 mt-1">
-                            {[...Array(review.rating)].map((_, i) => (
-                              <Star key={i} className="h-4 w-4 fill-tertiary text-tertiary" />
-                            ))}
-                          </div>
+              {activeSection === "bookings" && (
+                <Card className="shadow-md">
+                  <CardHeader>
+                    <CardTitle>Booking Requests</CardTitle>
+                    <CardDescription>Manage your service requests</CardDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    {[
+                      { customer: "Alice Johnson", service: "Electrical Wiring", date: "Tomorrow, 2:00 PM", status: "Pending" },
+                      { customer: "Bob Williams", service: "Circuit Repairs", date: "Dec 24, 10:00 AM", status: "Pending" },
+                      { customer: "Carol Davis", service: "Emergency Services", date: "Dec 23, 8:00 PM", status: "Accepted" },
+                    ].map((booking, idx) => (
+                      <div key={idx} className="flex flex-col sm:flex-row items-start justify-between p-4 border rounded-lg hover:bg-muted/30 transition-colors gap-4">
+                        <div className="flex-1">
+                          <h4 className="font-medium">{booking.customer}</h4>
+                          <p className="text-sm text-muted-foreground">{booking.service}</p>
+                          <p className="text-sm text-muted-foreground flex items-center gap-1 mt-1">
+                            <Clock className="h-3 w-3" />
+                            {booking.date}
+                          </p>
                         </div>
-                        <span className="text-sm text-muted-foreground">{review.date}</span>
+                        <div className="flex gap-2 items-center w-full sm:w-auto">
+                          <Badge variant={booking.status === "Accepted" ? "default" : "secondary"}>
+                            {booking.status}
+                          </Badge>
+                          {booking.status === "Pending" && (
+                            <>
+                              <Button variant="default" size="sm" className="flex-1 sm:flex-none">
+                                Accept
+                              </Button>
+                              <Button variant="destructive" size="sm" className="flex-1 sm:flex-none">
+                                Reject
+                              </Button>
+                            </>
+                          )}
+                        </div>
                       </div>
-                      <p className="text-sm text-muted-foreground">{review.comment}</p>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
+                    ))}
+                  </CardContent>
+                </Card>
+              )}
+
+              {activeSection === "reviews" && (
+                <Card className="shadow-md">
+                  <CardHeader>
+                    <CardTitle>Customer Reviews</CardTitle>
+                    <CardDescription>
+                      <div className="flex items-center gap-2 mt-2">
+                        <div className="flex items-center gap-1">
+                          <Star className="h-5 w-5 fill-tertiary text-tertiary" />
+                          <span className="font-semibold text-lg text-foreground">4.8</span>
+                        </div>
+                        <span className="text-muted-foreground">Average rating from 124 reviews</span>
+                      </div>
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    {[
+                      { customer: "Alice Johnson", rating: 5, comment: "Excellent work! Very professional and fixed the issue quickly.", date: "2 days ago" },
+                      { customer: "Bob Williams", rating: 4, comment: "Good service, arrived on time and did a thorough job.", date: "1 week ago" },
+                      { customer: "Carol Davis", rating: 5, comment: "Best electrician I've worked with. Highly recommend!", date: "2 weeks ago" },
+                      { customer: "David Brown", rating: 5, comment: "Quick response for emergency service. Very satisfied.", date: "3 weeks ago" },
+                    ].map((review, idx) => (
+                      <div key={idx} className="p-4 border rounded-lg space-y-2 hover:bg-muted/30 transition-colors">
+                        <div className="flex items-start justify-between">
+                          <div>
+                            <h4 className="font-medium">{review.customer}</h4>
+                            <div className="flex items-center gap-1 mt-1">
+                              {Array.from({ length: 5 }).map((_, i) => (
+                                <Star
+                                  key={i}
+                                  className={`h-4 w-4 ${
+                                    i < review.rating
+                                      ? "fill-tertiary text-tertiary"
+                                      : "text-muted-foreground"
+                                  }`}
+                                />
+                              ))}
+                            </div>
+                          </div>
+                          <span className="text-xs text-muted-foreground">{review.date}</span>
+                        </div>
+                        <p className="text-sm text-muted-foreground">{review.comment}</p>
+                      </div>
+                    ))}
+                  </CardContent>
+                </Card>
+              )}
+            </div>
           </div>
         </div>
       </main>

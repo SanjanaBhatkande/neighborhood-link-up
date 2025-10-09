@@ -1,9 +1,18 @@
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Search, MapPin } from "lucide-react";
 import heroBackground from "@/assets/hero-background.jpg";
+import MapPicker from "./MapPicker";
 
 const Hero = () => {
+  const [showMap, setShowMap] = useState(false);
+  const [selectedLocation, setSelectedLocation] = useState<string>("");
+
+  const handleLocationSelect = (lat: number, lng: number, address: string) => {
+    setSelectedLocation(address);
+  };
+
   return (
     <section className="relative min-h-[600px] flex items-center justify-center overflow-hidden">
       {/* Background Image */}
@@ -44,9 +53,16 @@ const Hero = () => {
                 <Input 
                   placeholder="Enter location or use map" 
                   className="pl-10 border-0 bg-transparent focus:ring-0"
+                  value={selectedLocation}
+                  onChange={(e) => setSelectedLocation(e.target.value)}
                 />
               </div>
-              <Button variant="outline" size="lg" className="md:w-auto">
+              <Button 
+                variant="outline" 
+                size="lg" 
+                className="md:w-auto"
+                onClick={() => setShowMap(true)}
+              >
                 <MapPin className="h-4 w-4 md:mr-2" />
                 <span className="hidden md:inline">Map View</span>
               </Button>
@@ -62,6 +78,13 @@ const Hero = () => {
           </Button>
         </div>
       </div>
+
+      {showMap && (
+        <MapPicker
+          onLocationSelect={handleLocationSelect}
+          onClose={() => setShowMap(false)}
+        />
+      )}
     </section>
   );
 };

@@ -116,7 +116,7 @@ const Login = () => {
             {/* Provider Panel */}
             <Card className="shadow-lg border-secondary/20">
               <CardHeader>
-                <CardTitle className="text-secondary">Service Provider</CardTitle>
+                <CardTitle className="text-secondary">Local Pro</CardTitle>
                 <CardDescription>
                   {loginMode === "login" 
                     ? "Manage your services and bookings" 
@@ -141,7 +141,7 @@ const Login = () => {
                         <Label htmlFor="provider-service">Service Type</Label>
                         <select 
                           id="provider-service" 
-                          className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                          className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
                           required
                         >
                           <option value="">Select service</option>
@@ -178,7 +178,7 @@ const Login = () => {
                   )}
                   
                   <Button type="submit" className="w-full" variant="hero">
-                    {loginMode === "login" ? "Login as Provider" : "Sign Up as Provider"}
+                    {loginMode === "login" ? "Login as Local Pro" : "Sign Up as Local Pro"}
                   </Button>
                   
                   <Button type="button" variant="outline" className="w-full">

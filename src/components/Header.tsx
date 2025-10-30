@@ -1,9 +1,27 @@
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Menu } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import Notifications from "./Notifications";
 
 const Header = () => {
+  const [user, setUser] = useState(null);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const storedUser = localStorage.getItem("user");
+    if (storedUser) {
+      setUser(JSON.parse(storedUser));
+    }
+  }, []);
+
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+    setUser(null);
+    navigate("/login");
+  };
+
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-card/80 backdrop-blur-sm">
       <div className="container mx-auto flex h-16 items-center justify-between px-4">
@@ -15,7 +33,7 @@ const Header = () => {
           <span className="text-xl font-bold text-foreground">LocalLink</span>
         </Link>
 
-        {/* Navigation - Desktop */}
+        {/* Navigation */}
         <nav className="hidden md:flex items-center space-x-6">
           <Link to="/" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
             Home
@@ -23,8 +41,8 @@ const Header = () => {
           <Link to="/services" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
             Services
           </Link>
-          <Link to="/providers" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
-            Providers
+          <Link to="/priceCompare" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
+            Compare Prices
           </Link>
           <Link to="/dashboard" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
             Dashboard
@@ -36,15 +54,26 @@ const Header = () => {
           <div className="hidden md:flex">
             <Notifications />
           </div>
-          
-          <div className="hidden md:flex items-center space-x-2">
-            <Link to="/login">
-              <Button variant="ghost">Login</Button>
-            </Link>
-            <Link to="/login">
-              <Button variant="hero">Sign Up</Button>
-            </Link>
-          </div>
+
+          {user ? (
+            <div className="hidden md:flex items-center space-x-3">
+              <span className="text-sm font-medium text-foreground">
+                Hi, {user.name?.split(" ")[0]} 👋
+              </span>
+              <Button variant="ghost" onClick={handleLogout}>
+                Logout
+              </Button>
+            </div>
+          ) : (
+            <div className="hidden md:flex items-center space-x-2">
+              <Link to="/login">
+                <Button variant="ghost">Login</Button>
+              </Link>
+              <Link to="/signup">
+                <Button variant="hero">Sign Up</Button>
+              </Link>
+            </div>
+          )}
 
           {/* Mobile Menu */}
           <Button variant="ghost" size="icon" className="md:hidden">

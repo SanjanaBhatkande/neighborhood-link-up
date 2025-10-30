@@ -1,60 +1,46 @@
-import { useState, useEffect } from "react";
 import { MapContainer, TileLayer, Marker, Popup, useMapEvents } from "react-leaflet";
+import "leaflet/dist/leaflet.css";
+import L from "leaflet";
+import { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { MapPin, X } from "lucide-react";
-import "leaflet/dist/leaflet.css";
-import L from "leaflet";
 
-// Fix for default marker icon
-delete (L.Icon.Default.prototype as any)._getIconUrl;
-L.Icon.Default.mergeOptions({
-  iconRetinaUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png",
-  iconUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png",
-  shadowUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png",
+// Fix default icon issue in Leaflet
+import iconUrl from "leaflet/dist/images/marker-icon.png";
+import iconShadow from "leaflet/dist/images/marker-shadow.png";
+const DefaultIcon = L.icon({
+  iconUrl,
+  shadowUrl: iconShadow,
+  iconAnchor: [12, 41],
 });
+L.Marker.prototype.options.icon = DefaultIcon;
 
 interface MapPickerProps {
   onLocationSelect: (lat: number, lng: number, address: string) => void;
   onClose: () => void;
 }
 
-function LocationMarker({ onLocationSelect }: { onLocationSelect: (lat: number, lng: number) => void }) {
-  const [position, setPosition] = useState<[number, number] | null>(null);
-
-  const map = useMapEvents({
-    click(e) {
-      const { lat, lng } = e.latlng;
-      setPosition([lat, lng]);
-      onLocationSelect(lat, lng);
-      map.flyTo(e.latlng, map.getZoom());
-    },
-  });
-
-  useEffect(() => {
-    map.locate();
-  }, [map]);
-
-  return position === null ? null : (
-    <Marker position={position}>
-      <Popup>Selected location</Popup>
-    </Marker>
-  );
-}
-
 const MapPicker = ({ onLocationSelect, onClose }: MapPickerProps) => {
-  const [selectedLocation, setSelectedLocation] = useState<{ lat: number; lng: number } | null>(null);
-  const defaultCenter: [number, number] = [28.6139, 77.209]; // Delhi, India
+  const [selected, setSelected] = useState<[number, number] | null>(null);
 
-  const handleLocationSelect = (lat: number, lng: number) => {
-    setSelectedLocation({ lat, lng });
-  };
+  const center: [number, number] = [28.6139, 77.209]; // Delhi
+
+  function LocationSelector() {
+    useMapEvents({
+      click(e) {
+        const { lat, lng } = e.latlng;
+        setSelected([lat, lng]);
+      },
+    });
+    return null;
+  }
 
   const handleConfirm = () => {
-    if (selectedLocation) {
-      // Mock address generation
-      const address = `${selectedLocation.lat.toFixed(4)}, ${selectedLocation.lng.toFixed(4)}`;
-      onLocationSelect(selectedLocation.lat, selectedLocation.lng, address);
+    if (selected) {
+      const [lat, lng] = selected;
+      const address = `${lat.toFixed(4)}, ${lng.toFixed(4)}`;
+      onLocationSelect(lat, lng, address);
       onClose();
     }
   };
@@ -74,30 +60,30 @@ const MapPicker = ({ onLocationSelect, onClose }: MapPickerProps) => {
 
         <div className="flex-1 relative">
           <MapContainer
-            center={defaultCenter}
+            center={center}
             zoom={13}
-            style={{ height: "100%", width: "100%" }}
-            className="z-0"
+            style={{ width: "100%", height: "100%", borderRadius: "0 0 8px 8px" }}
           >
             <TileLayer
-              attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+              attribution='&copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors'
               url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
             />
-            <LocationMarker onLocationSelect={handleLocationSelect} />
+            <LocationSelector />
+            {selected && (
+              <Marker position={selected}>
+                <Popup>Selected Location</Popup>
+              </Marker>
+            )}
           </MapContainer>
         </div>
 
         <div className="p-4 border-t flex items-center justify-between gap-4">
           <p className="text-sm text-muted-foreground">
-            {selectedLocation
-              ? `Selected: ${selectedLocation.lat.toFixed(4)}, ${selectedLocation.lng.toFixed(4)}`
+            {selected
+              ? `Selected: ${selected[0].toFixed(4)}, ${selected[1].toFixed(4)}`
               : "Click on the map to select your location"}
           </p>
-          <Button
-            variant="hero"
-            onClick={handleConfirm}
-            disabled={!selectedLocation}
-          >
+          <Button variant="hero" onClick={handleConfirm} disabled={!selected}>
             Confirm Location
           </Button>
         </div>

@@ -3,22 +3,22 @@ import { Star } from "lucide-react";
 
 const testimonials = [
   {
-    name: "Sarah Johnson",
-    location: "Downtown",
+    name: "Riya Patel",
+    location: "Mumbai",
     rating: 5,
     text: "Found an amazing plumber through LocalLink! Quick response and fair pricing. Highly recommend!",
     service: "Plumbing Service"
   },
   {
-    name: "Michael Chen", 
-    location: "Westside",
+    name: "Aayush Kadam", 
+    location: "Pune",
     rating: 5,
     text: "The electrician was professional and solved our issue in no time. Great platform for finding local services!",
     service: "Electrical Work"
   },
   {
-    name: "Emily Rodriguez",
-    location: "Northend", 
+    name: "Siddhi Sutar",
+    location: "Nashik", 
     rating: 5,
     text: "Excellent laundry service! They picked up and delivered on time. LocalLink makes it so convenient.",
     service: "Laundry Service"

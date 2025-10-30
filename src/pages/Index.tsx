@@ -6,34 +6,44 @@ import { Button } from "@/components/ui/button";
 import electricianIcon from "@/assets/electrician-icon.png";
 import plumberIcon from "@/assets/plumber-icon.png";
 import laundryIcon from "@/assets/laundry-icon.png";
+import RolePopup from "../components/RolePopup";
+import { Link, useNavigate } from "react-router-dom";
 
 const services = [
   {
     title: "Electricians",
-    description: "Licensed electrical professionals for repairs, installations, and maintenance. Available 24/7 for emergencies.",
+    description:
+      "Licensed electrical professionals for repairs, installations, and maintenance. Available 24/7 for emergencies.",
     icon: electricianIcon,
-    color: "primary" as const
+    color: "primary" as const,
   },
   {
-    title: "Plumbers", 
-    description: "Certified plumbing experts for all your water, drainage, and pipe needs. Quick response guaranteed.",
+    title: "Plumbers",
+    description:
+      "Certified plumbing experts for all your water, drainage, and pipe needs. Quick response guaranteed.",
     icon: plumberIcon,
-    color: "secondary" as const
+    color: "secondary" as const,
   },
   {
     title: "Laundry Services",
-    description: "Professional laundry and dry cleaning with pickup and delivery. Same day service available.",
+    description:
+      "Professional laundry and dry cleaning with pickup and delivery. Same day service available.",
     icon: laundryIcon,
-    color: "tertiary" as const
-  }
+    color: "tertiary" as const,
+  },
 ];
 
 const Index = () => {
+  const navigate = useNavigate(); // ✅ Move navigate here
+
   return (
     <div className="min-h-screen bg-background">
+      {/* Popup appears immediately on page visit */}
+      <RolePopup />
+
       <Header />
       <Hero />
-      
+
       {/* Featured Services Section */}
       <section className="py-16 bg-background">
         <div className="container mx-auto px-4">
@@ -42,7 +52,7 @@ const Index = () => {
               Popular Services in Your Area
             </h2>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              Connect with trusted local professionals for all your home and personal needs
+              Connect with trusted local professionals for all your home and personal needs.
             </p>
           </div>
 
@@ -66,13 +76,26 @@ const Index = () => {
             <p className="text-lg text-white/90 mb-8">
               Join our community of satisfied customers and discover reliable local services today.
             </p>
+
+            {/* ✅ FIXED BUTTONS SECTION */}
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button size="lg" className="bg-white text-primary hover:bg-white/90">
+              <Button
+                size="lg"
+                className="bg-white text-primary hover:text-green-500 hover:bg-white/90"
+                onClick={() => navigate("/booking")} // ✅ Works now
+              >
                 Book a Service
               </Button>
-              <Button variant="outline" size="lg" className="border-white text-white hover:bg-white hover:text-primary">
-                Browse Providers
-              </Button>
+
+              <Link to="/services">
+                <Button
+                  variant="outline"
+                  size="lg"
+                  className="border-white text-primary hover:text-green-500 hover:bg-white"
+                >
+                  Browse Providers
+                </Button>
+              </Link>
             </div>
           </div>
         </div>
@@ -127,7 +150,7 @@ const Index = () => {
 
           <div className="border-t mt-8 pt-8 text-center">
             <p className="text-sm text-muted-foreground">
-              © 2024 LocalLink. All rights reserved. Built with care for our community.
+              © 2025 LocalLink. All rights reserved. Built with care for our community.
             </p>
           </div>
         </div>

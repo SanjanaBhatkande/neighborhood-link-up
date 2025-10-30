@@ -9,6 +9,11 @@ import Services from "./pages/Services";
 import Login from "./pages/Login";
 import ProviderDashboard from "./pages/ProviderDashboard";
 import NotFound from "./pages/NotFound";
+import MapPage from "./pages/MapPage";
+import CompareServices from "./pages/CompareServices";
+import Signup from "./pages/SignUp";
+import BookingPage from "@/pages/BookingPage";
+import ProviderProfile from "./pages/ProviderProfile";
 
 const queryClient = new QueryClient();
 
@@ -21,10 +26,14 @@ const App = () => (
         <Routes>
           <Route path="/" element={<Index />} />
           <Route path="/services" element={<Services />} />
+          <Route path="/booking" element={<BookingPage />} />
+          <Route path="//provider/:name" element={<ProviderProfile />}/>
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/login" element={<Login />} />
+          <Route path="/signup" element={<Signup />} />
           <Route path="/provider-dashboard" element={<ProviderDashboard />} />
-          <Route path="/providers" element={<Services />} />
+          <Route path="/priceCompare" element={<CompareServices />} />
+          <Route path="/map" element={<MapPage />} /> {/* NEW MAP PAGE */}
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

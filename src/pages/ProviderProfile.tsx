@@ -43,7 +43,7 @@ const ProviderProfile = () => {
               ⭐ {provider.rating} ({provider.reviews} reviews)
             </p>
             <p className="text-sm text-gray-600">💰 {provider.price}</p>
-            <p className="text-sm text-gray-600">🕒 {provider.availability}</p>
+           
 
             {/* ✅ Book Now Button */}
             <div className="mt-6">

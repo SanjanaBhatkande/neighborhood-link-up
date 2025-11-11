@@ -1,49 +1,59 @@
-import { MapContainer, TileLayer, Marker, Popup, useMapEvents } from "react-leaflet";
-import "leaflet/dist/leaflet.css";
-import L from "leaflet";
-import { useState } from "react";
+import { useState, useCallback } from "react";
+import { GoogleMap, Marker, useJsApiLoader } from "@react-google-maps/api";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { MapPin, X } from "lucide-react";
-
-// Fix default icon issue in Leaflet
-import iconUrl from "leaflet/dist/images/marker-icon.png";
-import iconShadow from "leaflet/dist/images/marker-shadow.png";
-const DefaultIcon = L.icon({
-  iconUrl,
-  shadowUrl: iconShadow,
-  iconAnchor: [12, 41],
-});
-L.Marker.prototype.options.icon = DefaultIcon;
 
 interface MapPickerProps {
   onLocationSelect: (lat: number, lng: number, address: string) => void;
   onClose: () => void;
 }
 
+const containerStyle = {
+  width: "100%",
+  height: "100%",
+  borderRadius: "0 0 8px 8px",
+};
+
+const defaultCenter = { lat: 28.6139, lng: 77.209 }; // Delhi
+
 const MapPicker = ({ onLocationSelect, onClose }: MapPickerProps) => {
-  const [selected, setSelected] = useState<[number, number] | null>(null);
+  const [selected, setSelected] = useState<{ lat: number; lng: number } | null>(
+    null
+  );
+  const [address, setAddress] = useState("");
 
-  const center: [number, number] = [28.6139, 77.209]; // Delhi
+  // Load the Google Maps API
+  const { isLoaded } = useJsApiLoader({
+    googleMapsApiKey: import.meta.env.VITE_GOOGLE_MAPS_API_KEY as string, // ✅ Add your key in .env
+  });
 
-  function LocationSelector() {
-    useMapEvents({
-      click(e) {
-        const { lat, lng } = e.latlng;
-        setSelected([lat, lng]);
-      },
-    });
-    return null;
-  }
+  const handleClick = useCallback((event: google.maps.MapMouseEvent) => {
+    if (event.latLng) {
+      const lat = event.latLng.lat();
+      const lng = event.latLng.lng();
+      setSelected({ lat, lng });
+
+      // Reverse geocoding to get address
+      const geocoder = new google.maps.Geocoder();
+      geocoder.geocode({ location: { lat, lng } }, (results, status) => {
+        if (status === "OK" && results && results[0]) {
+          setAddress(results[0].formatted_address);
+        } else {
+          setAddress(`${lat.toFixed(4)}, ${lng.toFixed(4)}`);
+        }
+      });
+    }
+  }, []);
 
   const handleConfirm = () => {
     if (selected) {
-      const [lat, lng] = selected;
-      const address = `${lat.toFixed(4)}, ${lng.toFixed(4)}`;
-      onLocationSelect(lat, lng, address);
+      onLocationSelect(selected.lat, selected.lng, address);
       onClose();
     }
   };
+
+  if (!isLoaded) return <p>Loading map...</p>;
 
   return (
     <div className="fixed inset-0 z-50 bg-background/80 backdrop-blur-sm flex items-center justify-center p-4">
@@ -59,29 +69,19 @@ const MapPicker = ({ onLocationSelect, onClose }: MapPickerProps) => {
         </div>
 
         <div className="flex-1 relative">
-          <MapContainer
-            center={center}
+          <GoogleMap
+            mapContainerStyle={containerStyle}
+            center={selected || defaultCenter}
             zoom={13}
-            style={{ width: "100%", height: "100%", borderRadius: "0 0 8px 8px" }}
+            onClick={handleClick}
           >
-            <TileLayer
-              attribution='&copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors'
-              url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-            />
-            <LocationSelector />
-            {selected && (
-              <Marker position={selected}>
-                <Popup>Selected Location</Popup>
-              </Marker>
-            )}
-          </MapContainer>
+            {selected && <Marker position={selected} />}
+          </GoogleMap>
         </div>
 
         <div className="p-4 border-t flex items-center justify-between gap-4">
-          <p className="text-sm text-muted-foreground">
-            {selected
-              ? `Selected: ${selected[0].toFixed(4)}, ${selected[1].toFixed(4)}`
-              : "Click on the map to select your location"}
+          <p className="text-sm text-muted-foreground truncate">
+            {selected ? `Selected: ${address}` : "Click on the map to select your location"}
           </p>
           <Button variant="hero" onClick={handleConfirm} disabled={!selected}>
             Confirm Location

@@ -18,8 +18,23 @@ const CustomerDashboard = () => {
   const [selectedProvider, setSelectedProvider] = useState<string>("");
 
   useEffect(() => {
-    const storedBookings = localStorage.getItem("bookings");
-    if (storedBookings) setBookings(JSON.parse(storedBookings));
+    const storedBookings = JSON.parse(localStorage.getItem("bookings") || "[]");
+    const now = new Date();
+
+    const getEndTime = (dateStr: string, slot: string) => {
+      const [_, end] = slot.split(" - ");
+      const [time, meridiem] = end.split(" ");
+      let [hour, minute] = time.split(":").map(Number);
+      if (meridiem === "PM" && hour !== 12) hour += 12;
+      if (meridiem === "AM" && hour === 12) hour = 0;
+      const date = new Date(dateStr);
+      date.setHours(hour, minute, 0, 0);
+      return date;
+    };
+
+    const upcoming = storedBookings.filter((b: any) => getEndTime(b.date, b.slot) >= now);
+    localStorage.setItem("bookings", JSON.stringify(upcoming));
+    setBookings(upcoming);
 
     const storedUser = localStorage.getItem("user");
     if (storedUser) setUser(JSON.parse(storedUser));
@@ -37,7 +52,7 @@ const CustomerDashboard = () => {
           <Card className="md:col-span-1 h-fit shadow-md">
             <CardHeader><CardTitle className="text-base">Menu</CardTitle></CardHeader>
             <CardContent className="space-y-2">
-              {["bookings","profile","reviews","complaints"].map((sec) => (
+              {["bookings", "profile", "reviews", "complaints"].map((sec) => (
                 <Button
                   key={sec}
                   variant={activeSection === sec ? "default" : "outline"}
@@ -54,7 +69,7 @@ const CustomerDashboard = () => {
             </CardContent>
           </Card>
 
-          {/* Main */}
+          {/* Main Content */}
           <div className="md:col-span-3 space-y-6">
             {activeSection === "bookings" && (
               <Card className="shadow-md">
@@ -71,11 +86,11 @@ const CustomerDashboard = () => {
                           <p className="text-sm text-muted-foreground">{b.provider}</p>
                           <p className="text-xs text-muted-foreground">{b.date} ({b.slot})</p>
                         </div>
-                        <Badge variant={b.status === "Confirmed" ? "default" : "secondary"}>{b.status}</Badge>
+                        <Badge variant="default">{b.status}</Badge>
                       </div>
                     ))
                   ) : (
-                    <p className="text-muted-foreground">No bookings yet.</p>
+                    <p className="text-muted-foreground">No upcoming bookings.</p>
                   )}
                 </CardContent>
               </Card>
@@ -83,30 +98,25 @@ const CustomerDashboard = () => {
 
             {activeSection === "profile" && (
               <Card className="shadow-md">
-                <CardHeader>
-                  <CardTitle>Profile</CardTitle>
-                  <CardDescription>Your personal info</CardDescription>
-                </CardHeader>
+                <CardHeader><CardTitle>Profile</CardTitle></CardHeader>
                 <CardContent>
                   <p><strong>Name:</strong> {user?.name || "Guest"}</p>
                   <p><strong>Email:</strong> {user?.email || "N/A"}</p>
-                  <Button variant="hero" className="mt-4 w-full">Edit Profile</Button>
                 </CardContent>
               </Card>
             )}
 
             {activeSection === "reviews" && (
               <Card className="shadow-md">
-                <CardHeader>
-                  <CardTitle>Write a Review</CardTitle>
-                  <CardDescription>Select a provider to review</CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-4">
+                <CardHeader><CardTitle>Write a Review</CardTitle></CardHeader>
+                <CardContent>
                   <Select onValueChange={setSelectedProvider}>
                     <SelectTrigger><SelectValue placeholder="Select Provider" /></SelectTrigger>
                     <SelectContent>
-                      {providers.map(p => (
-                        <SelectItem key={p.name} value={p.name}>{p.name} — {p.service}</SelectItem>
+                      {providers.map((p) => (
+                        <SelectItem key={p.name} value={p.name}>
+                          {p.name} — {p.service}
+                        </SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
@@ -117,16 +127,15 @@ const CustomerDashboard = () => {
 
             {activeSection === "complaints" && (
               <Card className="shadow-md">
-                <CardHeader>
-                  <CardTitle>Submit a Complaint</CardTitle>
-                  <CardDescription>Select a provider</CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-4">
+                <CardHeader><CardTitle>Submit a Complaint</CardTitle></CardHeader>
+                <CardContent>
                   <Select onValueChange={setSelectedProvider}>
                     <SelectTrigger><SelectValue placeholder="Select Provider" /></SelectTrigger>
                     <SelectContent>
-                      {providers.map(p => (
-                        <SelectItem key={p.name} value={p.name}>{p.name} — {p.service}</SelectItem>
+                      {providers.map((p) => (
+                        <SelectItem key={p.name} value={p.name}>
+                          {p.name} — {p.service}
+                        </SelectItem>
                       ))}
                     </SelectContent>
                   </Select>

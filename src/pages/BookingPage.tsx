@@ -26,7 +26,7 @@ const BookingPage = () => {
   const handleConfirm = () => {
     if (!selectedProvider) return alert("Please select a provider.");
     if (!selectedDate || !selectedSlot)
-      return alert("Please select both a date and a time slot.");
+      return alert("Please select both a date and time slot.");
 
     const booking = {
       provider: selectedProvider.name,
@@ -34,12 +34,24 @@ const BookingPage = () => {
       date: selectedDate,
       slot: selectedSlot,
       status: "Confirmed",
+      bookedAt: new Date().toISOString(),
     };
 
-    // Store booking in localStorage
     const existing = JSON.parse(localStorage.getItem("bookings") || "[]");
     existing.push(booking);
     localStorage.setItem("bookings", JSON.stringify(existing));
+
+    // ✅ Add notification entry
+    const notifications = JSON.parse(localStorage.getItem("notifications") || "[]");
+    notifications.push({
+      id: Date.now(),
+      title: "Booking Confirmed",
+      message: `Your booking with ${booking.provider} for ${booking.service} on ${booking.date} (${booking.slot}) is confirmed.`,
+      time: new Date().toLocaleString(),
+      read: false,
+      type: "success",
+    });
+    localStorage.setItem("notifications", JSON.stringify(notifications));
 
     alert(`✅ Booking confirmed with ${selectedProvider.name}`);
     navigate("/dashboard");
@@ -64,7 +76,6 @@ const BookingPage = () => {
               Book Your Service
             </h2>
 
-            {/* Provider Selection */}
             {!selectedProvider && (
               <div className="mb-6">
                 <label className="block text-sm font-medium mb-1">
@@ -89,84 +100,81 @@ const BookingPage = () => {
               </div>
             )}
 
-            {/* Provider Info */}
             {selectedProvider && (
-              <div className="flex flex-col sm:flex-row items-center sm:items-start gap-5 mb-8 border p-4 rounded-xl bg-card/50">
-                <img
-                  src={selectedProvider.avatar}
-                  alt={selectedProvider.name}
-                  className="w-24 h-24 rounded-xl object-cover"
-                />
-                <div className="flex-1 text-center sm:text-left">
-                  <div className="flex items-center justify-center sm:justify-between">
-                    <h3 className="text-xl font-semibold">
-                      {selectedProvider.name}
-                    </h3>
-                    {selectedProvider.verified && (
-                      <CheckCircle className="text-green-500 h-5 w-5" />
-                    )}
-                  </div>
-                  <p className="text-muted-foreground text-sm">
-                    {selectedProvider.service}
-                  </p>
-                  <div className="flex items-center justify-center sm:justify-start gap-1 mt-2 text-sm text-muted-foreground">
-                    <Star className="h-4 w-4 fill-warning text-warning" />
-                    <span>
-                      {selectedProvider.rating} ({selectedProvider.reviews}{" "}
-                      reviews)
-                    </span>
-                  </div>
-                  <div className="flex items-center justify-center sm:justify-start gap-1 text-sm text-muted-foreground">
-                    <MapPin className="h-3 w-3" /> {selectedProvider.location}
-                  </div>
-                  <p className="text-sm text-gray-700 mt-1">
-                    💰 <strong>{selectedProvider.price}</strong> —{" "}
-                    <span>{selectedProvider.availability}</span>
-                  </p>
-                </div>
-              </div>
-            )}
-
-            {/* Booking Form */}
-            {selectedProvider && (
-              <div className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium mb-1">
-                    Select Date
-                  </label>
-                  <input
-                    type="date"
-                    className="w-full border rounded-md px-3 py-2"
-                    value={selectedDate}
-                    onChange={(e) => setSelectedDate(e.target.value)}
+              <>
+                <div className="flex flex-col sm:flex-row items-center sm:items-start gap-5 mb-8 border p-4 rounded-xl bg-card/50">
+                  <img
+                    src={selectedProvider.avatar}
+                    alt={selectedProvider.name}
+                    className="w-24 h-24 rounded-xl object-cover"
                   />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium mb-1">
-                    Select Time Slot
-                  </label>
-                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-                    {availableSlots.map((slot) => (
-                      <button
-                        key={slot}
-                        onClick={() => setSelectedSlot(slot)}
-                        className={`border rounded-md px-3 py-2 text-sm transition-all ${
-                          selectedSlot === slot
-                            ? "bg-primary text-white border-primary"
-                            : "hover:bg-accent"
-                        }`}
-                      >
-                        {slot}
-                      </button>
-                    ))}
+                  <div className="flex-1 text-center sm:text-left">
+                    <div className="flex items-center justify-center sm:justify-between">
+                      <h3 className="text-xl font-semibold">
+                        {selectedProvider.name}
+                      </h3>
+                      {selectedProvider.verified && (
+                        <CheckCircle className="text-green-500 h-5 w-5" />
+                      )}
+                    </div>
+                    <p className="text-muted-foreground text-sm">
+                      {selectedProvider.service}
+                    </p>
+                    <div className="flex items-center gap-1 mt-2 text-sm text-muted-foreground">
+                      <Star className="h-4 w-4 fill-warning text-warning" />
+                      <span>
+                        {selectedProvider.rating} ({selectedProvider.reviews})
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-1 text-sm text-muted-foreground">
+                      <MapPin className="h-3 w-3" /> {selectedProvider.location}
+                    </div>
+                    <p className="text-sm text-gray-700 mt-1">
+                      💰 <strong>{selectedProvider.price}</strong> —{" "}
+                      <span>{selectedProvider.availability}</span>
+                    </p>
                   </div>
                 </div>
 
-                <Button className="w-full mt-4" onClick={handleConfirm}>
-                  Confirm Booking
-                </Button>
-              </div>
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium mb-1">
+                      Select Date
+                    </label>
+                    <input
+                      type="date"
+                      className="w-full border rounded-md px-3 py-2"
+                      value={selectedDate}
+                      onChange={(e) => setSelectedDate(e.target.value)}
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium mb-1">
+                      Select Time Slot
+                    </label>
+                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                      {availableSlots.map((slot) => (
+                        <button
+                          key={slot}
+                          onClick={() => setSelectedSlot(slot)}
+                          className={`border rounded-md px-3 py-2 text-sm transition-all ${
+                            selectedSlot === slot
+                              ? "bg-primary text-white border-primary"
+                              : "hover:bg-accent"
+                          }`}
+                        >
+                          {slot}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  <Button className="w-full mt-4" onClick={handleConfirm}>
+                    Confirm Booking
+                  </Button>
+                </div>
+              </>
             )}
           </CardContent>
         </Card>

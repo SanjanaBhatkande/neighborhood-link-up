@@ -28,20 +28,20 @@ const ProviderCard = ({
 }: ProviderCardProps) => {
   const navigate = useNavigate();
 
+  // ✅ Book Now → redirects with full provider object
   const handleBookNow = () => {
-    navigate("/booking", {
-      state: {
-        name,
-        service,
-        rating,
-        reviews,
-        location,
-        price,
-        verified,
-        avatar,
-        availability,
-      },
-    });
+    const provider = {
+      name,
+      service,
+      rating,
+      reviews,
+      location,
+      price,
+      verified,
+      avatar,
+      availability,
+    };
+    navigate("/booking", { state: { provider } });
   };
 
   const handleViewProfile = () => {
@@ -97,7 +97,7 @@ const ProviderCard = ({
           </span>
         </div>
 
-        {/* Location & Availability */}
+        {/* Location */}
         <div className="flex items-center justify-between w-full mb-4 text-sm text-muted-foreground">
           <div className="flex items-center space-x-1">
             <MapPin className="h-3 w-3" />
@@ -109,7 +109,7 @@ const ProviderCard = ({
           </div>
         </div>
 
-        {/* Action Buttons */}
+        {/* Buttons */}
         <div className="flex gap-2 w-full">
           <Button 
             size="sm"

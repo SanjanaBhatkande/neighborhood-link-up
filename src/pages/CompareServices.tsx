@@ -91,7 +91,7 @@ const CompareServices = () => {
                     </td>
                     <td className="p-3 font-semibold text-primary">{p.price}</td>
                     <td className="p-3 text-muted-foreground">{p.location}</td>
-                    <td className="p-3 text-success text-xs">{p.availability}</td>
+                    
                   </tr>
                 ))}
               </tbody>
